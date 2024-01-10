@@ -250,11 +250,66 @@ function highlightActivatedLink() {
   });
 }
 
+function initSwiper() {
+  const swiper = new Swiper(".swiper", {
+    slidesPerView: 1,
+    spaceBetween: 30,
+    freemode: true,
+    loop: true,
+    grabCursor: true,
+    lazyPreloadPrevNext: 3,
+    autoplay: { delay: 5000 },
+    breakpoints: {
+      500: {
+        slidesPerView: 2,
+        spaceBetween: 30,
+      },
+
+      700: {
+        slidesPerView: 3,
+        spaceBetween: 30,
+      },
+
+      900: {
+        slidesPerView: 4,
+        spaceBetween: 40,
+      },
+      1200: {
+        slidesPerView: 5,
+        spaceBetween: 50,
+      },
+    },
+  });
+}
+
+async function displaySliderMovie() {
+  const { results } = await fetchTMDBAPIData("movie/now_playing");
+  results.forEach((element) => {
+    const divElement = document.createElement("div");
+    divElement.innerHTML = `<a href="movie-details.html?id=${element.id}">
+    <img src="${
+      element.poster_path
+        ? `https://image.tmdb.org/t/p/w500${element.poster_path}`
+        : "../images/no-image.jpg"
+    }" alt="${element.original_title}" />
+  </a>
+  <h4 class="swiper-rating">
+    <i class="fas fa-star text-secondary"></i> ${element.vote_average.toFixed(
+      2
+    )} / 10
+  </h4>`;
+    divElement.classList.add("swiper-slide");
+    document.querySelector(".swiper-wrapper").appendChild(divElement);
+    initSwiper();
+  });
+}
+
 // ()=> Initialize on every page
 function init() {
   switch (global.routePage) {
     case "/":
     case "/index.html":
+      displaySliderMovie();
       dispalyPopularMovies();
       break;
     case "/movie-details.html":
