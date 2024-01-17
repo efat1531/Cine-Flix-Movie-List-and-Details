@@ -1,5 +1,11 @@
 const global = {
   routePage: window.location.pathname,
+  search: {
+    term: "",
+    type: "",
+    pages: 1,
+    totalPages: 1,
+  },
 };
 
 console.log(global.routePage);
@@ -304,6 +310,46 @@ async function displaySliderMovie() {
   });
 }
 
+// ()=> Search Show List
+async function searchShowList() {
+  const queryPath = window.location.search;
+  const urlPerm = new URLSearchParams(queryPath);
+  global.search.type = urlPerm.get("type");
+  global.search.term = urlPerm.get("search-term");
+  if (global.search.term.trim() === "" || global.search.term.trim() === null) {
+    toast = document.querySelector(".toast");
+    (closeIcon = document.querySelector(".close")),
+      (progress = document.querySelector(".progress"));
+
+    let timer1, timer2;
+
+    toast.classList.add("active");
+    progress.classList.add("active");
+
+    timer1 = setTimeout(() => {
+      toast.classList.remove("active");
+    }, 5000); //1s = 1000 milliseconds
+
+    timer2 = setTimeout(() => {
+      progress.classList.remove("active");
+    }, 5300);
+
+    closeIcon.addEventListener("click", () => {
+      toast.classList.remove("active");
+
+      setTimeout(() => {
+        progress.classList.remove("active");
+      }, 300);
+
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+    });
+  } else {
+    console.log(global.search.type);
+    console.log(global.search.term);
+  }
+}
+
 // ()=> Initialize on every page
 function init() {
   switch (global.routePage) {
@@ -319,6 +365,7 @@ function init() {
       displayPopularTVShow();
       break;
     case "/search.html":
+      searchShowList();
       break;
     case "/tv-details.html":
       showTvSeriesDetails();

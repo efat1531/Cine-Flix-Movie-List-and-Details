@@ -13,6 +13,13 @@
     <link rel="stylesheet" href="lib/fontawesome.css" />
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/spinner.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"
+      integrity="sha512-5A8nwdMOWrSz20fDsjczgUidUBR8liPYU+WymTZP1lmY9G6Oc7HlZv156XqnsgNUzTyMefFTcsFH/tnJE/+xBg=="
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="css/customalert.css" />
     <script src="js/script.js" defer></script>
     <title>Cine Flix | Search Movies &amp; Shows</title>
   </head>
@@ -36,7 +43,24 @@
     <!-- Search Movies -->
     <section class="search">
       <div class="container">
-        <div id="alert"></div>
+        <div id="alert">
+          <div class="toast">
+            <div class="toast-content">
+              <i
+                class="fa-solid fa-triangle-exclamation fa-3x"
+                style="color: #d30d0d"
+              ></i>
+              <div class="message">
+                <span class="text text-1">Error</span>
+                <span class="text text-2"
+                  >Please insert some text inside the search box.</span
+                >
+              </div>
+            </div>
+            <i class="fa-solid fa-xmark close"></i>
+            <div class="progress"></div>
+          </div>
+        </div>
         <form action="/search.html" class="search-form">
           <div class="search-radio">
             <input type="radio" id="movie" name="type" value="movie" checked />
