@@ -11,13 +11,14 @@ const global = {
 console.log(global.routePage);
 
 // ()=> Fetch data from server through API
-async function fetchTMDBAPIData(endpoint) {
+async function fetchTMDBAPIData(endpoint, atEndPoint = "?", pages = null) {
   const apiURL = "https://api.themoviedb.org/3/";
   const apiKey = "23492f9cdc690249cb219ebeb76e7a05";
-
-  const response = await fetch(
-    `${apiURL}/${endpoint}?api_key=${apiKey}&language=en-US`
-  );
+  const request = `${apiURL}${endpoint}${atEndPoint}api_key=${apiKey}&language=en-US${
+    pages === null ? "" : `&page=${global.search.pages}`
+  }`;
+  console.log(request);
+  const response = await fetch(request);
   const data = response.json();
   return data;
 }
@@ -310,6 +311,108 @@ async function displaySliderMovie() {
   });
 }
 
+async function showSearchForTVShows() {
+  const data = await fetchTMDBAPIData(
+    `search/tv?query=${global.search.term}`,
+    "&",
+    2
+  );
+  global.search.totalPages = data.total_pages;
+  const searchElement = document.querySelector("#search-results");
+  searchElement.innerHTML = "";
+  document.querySelector("#pagination").innerHTML = "";
+  data.results.forEach((element) => {
+    const createElement = createDiv(element, "tv");
+    searchElement.appendChild(createElement);
+  });
+  const searchHeader = document.querySelector("#search-results-heading");
+  searchHeader.innerHTML = `Showing ${
+    20 * global.search.pages - 20 + 1
+  } to ${Math.min(data.total_results, 20 * global.search.pages)} from ${
+    data.total_results
+  } Results`;
+  if (data.total_results > 20) {
+    const paginationDiv = document.createElement("div");
+    paginationDiv.classList.add("pagination");
+    paginationDiv.innerHTML = ` <button class="btn btn-primary" id="prev">Prev</button>
+    <button class="btn btn-primary" id="next">Next</button>
+    <div class="page-counter">Page 1 of 5</div>`;
+    document.querySelector("#pagination").appendChild(paginationDiv);
+    const pageCounter = document.querySelector(".page-counter");
+    pageCounter.innerHTML = `Page ${global.search.pages} of ${data.total_pages}`;
+
+    //disable button
+    if (global.search.pages === 1) {
+      document.querySelector("#prev").disabled = true;
+    } else if (global.search.pages === global.search.totalPages) {
+      document.querySelector("#next").disabled = true;
+    }
+
+    document.querySelector("#next").addEventListener("click", showNextPage);
+    document.querySelector("#prev").addEventListener("click", showPreviousPage);
+  }
+}
+
+function showNextPage() {
+  global.search.pages += 1;
+  if (global.search.type === "movie") {
+    showSearchForMovies();
+  } else {
+    showSearchForTVShows();
+  }
+}
+
+function showPreviousPage() {
+  global.search.pages -= 1;
+  if (global.search.type === "movie") {
+    showSearchForMovies();
+  } else {
+    showSearchForTVShows();
+  }
+}
+
+async function showSearchForMovies() {
+  const data = await fetchTMDBAPIData(
+    `search/movie?query=${global.search.term}`,
+    "&",
+    1
+  );
+  global.search.totalPages = data.total_pages;
+  const searchElement = document.querySelector("#search-results");
+  searchElement.innerHTML = "";
+  document.querySelector("#pagination").innerHTML = "";
+  data.results.forEach((element) => {
+    const createElement = createDiv(element, "movie");
+    searchElement.appendChild(createElement);
+  });
+  const searchHeader = document.querySelector("#search-results-heading");
+  searchHeader.innerHTML = `Showing ${
+    20 * global.search.pages - 20 + 1
+  } to ${Math.min(data.total_results, 20 * global.search.pages)} from ${
+    data.total_results
+  } Results`;
+  if (data.total_results > 20) {
+    const paginationDiv = document.createElement("div");
+    paginationDiv.classList.add("pagination");
+    paginationDiv.innerHTML = ` <button class="btn btn-primary" id="prev">Prev</button>
+    <button class="btn btn-primary" id="next">Next</button>
+    <div class="page-counter">Page 1 of 5</div>`;
+    document.querySelector("#pagination").appendChild(paginationDiv);
+    const pageCounter = document.querySelector(".page-counter");
+    pageCounter.innerHTML = `Page ${global.search.pages} of ${data.total_pages}`;
+
+    //disable button
+    if (global.search.pages === 1) {
+      document.querySelector("#prev").disabled = true;
+    } else if (global.search.pages === global.search.totalPages) {
+      document.querySelector("#next").disabled = true;
+    }
+
+    document.querySelector("#next").addEventListener("click", showNextPage);
+    document.querySelector("#prev").addEventListener("click", showPreviousPage);
+  }
+}
+
 // ()=> Search Show List
 async function searchShowList() {
   const queryPath = window.location.search;
@@ -345,8 +448,12 @@ async function searchShowList() {
       clearTimeout(timer2);
     });
   } else {
-    console.log(global.search.type);
-    console.log(global.search.term);
+    global.search.pages = 1;
+    if (global.search.type === "movie") {
+      showSearchForMovies();
+    } else {
+      showSearchForTVShows();
+    }
   }
 }
 
